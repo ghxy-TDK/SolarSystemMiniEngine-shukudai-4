@@ -1,41 +1,48 @@
-﻿#pragma once
-// scene/object.h
-// Phase 3 minimal stub -- expanded in Phase 4 (scene/object.cpp).
-// Provides enough interface for Renderer to call render() and access transform.
-#include <memory>
-#include <vector>
-#include "../math/matrix4.h"
+#pragma once
+#include "transform.h"
 #include "../render/material.h"
 #include "../geometry/mesh.h"
+#include <memory>
+#include <string>
+#include <vector>
 
-// Forward declaration from scene/transform.h (defined in Phase 2).
-// Provide a minimal version here so Phase 3 compiles standalone.
-#ifndef TRANSFORM_DEFINED
-#define TRANSFORM_DEFINED
-#include "../math/vec3.h"
-struct Transform {
-    Vec3  position = {0,0,0};
-    Vec3  scale    = {1,1,1};
-    Vec3  rotation_axis = {0,1,0};
-    float rotation_angle_deg = 0.f;
-    Transform* parent = nullptr;
+class Shader;
 
-    Matrix4 get_local_matrix() const;
-    Matrix4 get_world_matrix() const;
-};
-#endif
-
+// ---------------------------------------------------------------------------
+// Object
+//
+// A renderable entity that owns one or more Mesh instances (via unique_ptr)
+// and references a shared Material.  The Transform stores local/world TRS.
+//
+// Ownership:
+//   - Object owns its Mesh list exclusively (unique_ptr).
+//   - Material is shared (shared_ptr); multiple Objects may share one.
+//   - Scene owns Object instances (unique_ptr<Object>).
+// ---------------------------------------------------------------------------
 class Object {
 public:
-    Transform              transform;
-    std::shared_ptr<Material> material;
+    explicit Object(std::string name = "");
 
-    void add_mesh(std::unique_ptr<Mesh> mesh) {
-        meshes_.push_back(std::move(mesh));
-    }
+    // --- data ---
+    std::string                 name;
+    Transform                   transform;
+    std::shared_ptr<Material>   material;
 
-    // Sets u_material.* uniforms then calls Mesh::draw() for every mesh.
+    // --- mesh management ---
+
+    // Takes ownership of the Mesh.  Called by SolarSystem / Model in later stages.
+    void add_mesh(std::unique_ptr<Mesh> mesh);
+
+    // --- rendering ---
+
+    // Computes u_model from transform.get_world_matrix(),
+    // computes u_normal_matrix (inverse-transpose of the upper-left 3x3),
+    // applies material uniforms, then calls draw() on every owned Mesh.
+    // Does nothing if material is nullptr.
     void render(Shader& shader) const;
+
+    // --- inspection ---
+    std::size_t mesh_count() const { return meshes_.size(); }
 
 private:
     std::vector<std::unique_ptr<Mesh>> meshes_;
