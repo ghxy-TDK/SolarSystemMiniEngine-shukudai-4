@@ -26,9 +26,10 @@ This project implements a **simple graphics engine** and builds a **solar system
 
 ## Project Architecture
 
-This project adopts a **modular engine architecture**. The structure is as follows:
+This project adopts a **modular engine architecture**. The overall structure is shown below:
 
-SOLARSYSTEMMINIENGINE
+```text
+SolarSystemMiniEngine
 ├── CMakeLists.txt
 ├── CMakePresets.json
 ├── CppProperties.json
@@ -126,7 +127,24 @@ SOLARSYSTEMMINIENGINE
     ├── main_test_8.cpp
     ├── main_test_9.cpp
     └── main_test_10.cpp
-    
+```
+
+### Core Module Description
+
+| Module | Responsibility |
+|----------|----------|
+| `config` | Global engine configuration and compile-time settings |
+| `core` | Application lifecycle management and timing system |
+| `debug` | OpenGL debugging and error checking utilities |
+| `geometry` | Procedural generation of geometric primitives such as spheres, cubes, meshes, and orbits |
+| `math` | Mathematical foundation including vectors, matrices, and utility functions |
+| `model` | OBJ model loading and model resource management |
+| `particle` | Particle system implementation and particle simulation |
+| `raytracing` | Whitted-style ray tracing renderer and intersection computation |
+| `render` | Rendering subsystem including renderer, shaders, materials, cameras, and lights |
+| `scene` | Scene graph, transforms, celestial bodies, and solar system simulation |
+| `assets` | External resources such as shaders and models |
+| `tests` | Incremental stage tests and feature verification programs |
 
 ## Core Module Description
 
