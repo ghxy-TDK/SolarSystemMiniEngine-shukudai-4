@@ -129,7 +129,7 @@ SolarSystemMiniEngine
     └── main_test_10.cpp
 ```
 
-### Core Module Description
+## Core Module Description
 
 | Module | Responsibility |
 |----------|----------|
@@ -145,7 +145,3 @@ SolarSystemMiniEngine
 | `scene` | Scene graph, transforms, celestial bodies, and solar system simulation |
 | `assets` | External resources such as shaders and models |
 | `tests` | Incremental stage tests and feature verification programs |
-
-## Core Module Description
-
-> To be added
