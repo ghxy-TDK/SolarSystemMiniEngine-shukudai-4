@@ -25,3 +25,9 @@ void Model::inject_into(Object& obj) {
     // After moving, each unique_ptr is null; clear the vector.
     meshes_.clear();
 }
+
+void Model::setup_all_meshes() {
+    for (auto& mesh : meshes_) {
+        if (mesh) mesh->setup_mesh();
+    }
+}

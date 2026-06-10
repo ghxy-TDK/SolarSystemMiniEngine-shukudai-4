@@ -24,6 +24,8 @@ public:
     // Returns the number of meshes currently owned (0 after inject_into).
     std::size_t mesh_count() const { return meshes_.size(); }
 
+    void setup_all_meshes();  // 在 glewInit 后、inject_into 前调用
+
 private:
     std::vector<std::unique_ptr<Mesh>> meshes_;
 };
