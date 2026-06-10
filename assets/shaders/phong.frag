@@ -3,7 +3,7 @@
 // ------------------------------------------------------------
 // Inputs from vertex shader
 // ------------------------------------------------------------
-in vec3 v_frag_pos;   // world-space fragment position
+in vec3 v_world_pos;   // world-space fragment position
 in vec3 v_normal;     // world-space normal (normalised in vert)
 in vec2 v_tex_coord;  // UV (unused for now, reserved)
 
@@ -68,8 +68,8 @@ vec3 blinn_phong_specular(vec3 n, vec3 l, vec3 v, vec3 light_radiance) {
 // ------------------------------------------------------------
 void main() {
     vec3 n = normalize(v_normal);
-    vec3 l = normalize(u_point_light.position - v_frag_pos);
-    vec3 v = normalize(u_cam_pos - v_frag_pos);
+    vec3 l = normalize(u_point_light.position - v_world_pos);
+    vec3 v = normalize(u_cam_pos - v_world_pos);
 
     // Effective radiance of the light at this fragment.
     vec3 light_radiance = u_point_light.color * u_point_light.intensity;
