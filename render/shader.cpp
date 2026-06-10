@@ -90,7 +90,9 @@ void Shader::use() const { GL_CHECK(glUseProgram(program_)); }
 
 int Shader::location(const std::string& name) const {
     int loc = glGetUniformLocation(program_, name.c_str());
-    if (loc == -1) std::cerr << "[Shader] uniform not found: " << name << "\n";
+    if (loc == -1)
+        std::cerr << "[Shader] prog=" << program_
+        << " uniform not found: " << name << "\n";
     return loc;
 }
 
@@ -98,6 +100,10 @@ void Shader::set_int(const std::string& n, int   v) const { GL_CHECK(glUniform1i
 void Shader::set_float(const std::string& n, float v) const { GL_CHECK(glUniform1f(location(n), v)); }
 void Shader::set_vec3(const std::string& n, const Vec3& v) const {
     GL_CHECK(glUniform3f(location(n), v.x, v.y, v.z));
+}
+void Shader::set_vec4(const std::string& name, const Vec4& v) const {
+    glUniform4f(glGetUniformLocation(program_, name.c_str()),
+        v.x, v.y, v.z, v.w);
 }
 // std::data(m.m) works for both float[16] (C++17) and std::array<float,16>.
 void Shader::set_mat4(const std::string& n, const Matrix4& m) const {

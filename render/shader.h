@@ -3,6 +3,7 @@
 #include <string>
 #include "../math/vec3.h"
 #include "../math/matrix4.h"
+#include "../math/vec4.h"
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shader — compiles & links one GLSL program from vertex + fragment source
@@ -32,6 +33,7 @@ public:
     void set_int  (const std::string& name, int            v) const;
     void set_float(const std::string& name, float          v) const;
     void set_vec3 (const std::string& name, const Vec3&    v) const;
+    void set_vec4 (const std::string& name, const Vec4& v) const;
     void set_mat4 (const std::string& name, const Matrix4& m) const;
     // Accepts a column-major float[9] (matches GL convention).
     void set_mat3 (const std::string& name, const float*   m3) const;

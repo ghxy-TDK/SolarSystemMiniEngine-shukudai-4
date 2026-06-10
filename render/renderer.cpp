@@ -1,3 +1,7 @@
+#include <GL/glew.h>
+#include <iostream>
+#include "../particle/particle_system.h"
+
 #include "renderer.h"
 
 #include "shader.h"
@@ -104,19 +108,36 @@ void Renderer::render_opaque(const Camera& cam, Shader& shader) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Renderer::render_transparent  — phase 7 (alpha sort + blend)
+// Renderer::render_debug  — phase 5 (wireframe / normals)
 // ─────────────────────────────────────────────────────────────────────────────
-void Renderer::render_transparent(const Camera& /*cam*/, Shader& /*shader*/) {
-    // TODO (phase 7): sort transparent_queue_ back-to-front relative to cam,
-    // enable GL_BLEND, render each ParticleSystem, disable GL_BLEND.
+void Renderer::render_debug(const Camera& cam, Shader& line_shader) {
+    if (debug_queue_.empty()) return;
+
+    line_shader.use();
+    line_shader.set_mat4("u_view", cam.get_view_matrix());
+    line_shader.set_mat4("u_projection", cam.get_projection_matrix());
+    line_shader.set_vec3("u_line_color", Vec3{ 0.4f, 0.4f, 0.4f });
+
+    for (const Object* obj : debug_queue_) {
+        Matrix4 model = obj->transform.get_world_matrix();
+        line_shader.set_mat4("u_model", model);
+        obj->draw_meshes_only();
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Renderer::render_debug  — phase 5 (wireframe / normals)
+// Renderer::render_transparent  — phase 7 (alpha sort + blend)
 // ─────────────────────────────────────────────────────────────────────────────
-void Renderer::render_debug(const Camera& /*cam*/, Shader& /*line_shader*/) {
-    // TODO (phase 5): glPolygonMode(GL_FRONT_AND_BACK, GL_LINE), render
-    // debug_queue_, restore GL_FILL.
+void Renderer::render_transparent(const Camera& cam, Shader& shader) {
+    if (transparent_queue_.empty()) return;
+
+    shader.use();
+    shader.set_mat4("u_view", cam.get_view_matrix());
+    shader.set_mat4("u_projection", cam.get_projection_matrix());
+
+    for (const ParticleSystem* ps : transparent_queue_) {
+        ps->draw(cam, shader);
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
