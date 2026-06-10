@@ -24,11 +24,12 @@ struct Vertex {
 class Mesh {
 public:
     Mesh(std::vector<Vertex>       vertices,
-         std::vector<unsigned int> indices);
+        std::vector<unsigned int> indices,
+        unsigned int             primitive = 0x0004);
     ~Mesh();  // glDeleteVertexArrays + glDeleteBuffers
 
     // Non-copyable (GL handles are not ref-counted here).
-    Mesh(const Mesh&)            = delete;
+    Mesh(const Mesh&) = delete;
     Mesh& operator=(const Mesh&) = delete;
     Mesh(Mesh&&) noexcept;
     Mesh& operator=(Mesh&&) noexcept;
@@ -42,12 +43,14 @@ public:
     void draw() const;
 
     // Read-only access (useful for ray-tracing queries).
-    const std::vector<Vertex>&       vertices() const { return vertices_; }
-    const std::vector<unsigned int>& indices()  const { return indices_;  }
+    const std::vector<Vertex>& vertices() const { return vertices_; }
+    const std::vector<unsigned int>& indices()  const { return indices_; }
 
 private:
     std::vector<Vertex>       vertices_;
     std::vector<unsigned int> indices_;
+
+    unsigned int primitive_ = 0x0004; // GL_TRIANGLES
 
     unsigned int vao_ = 0;
     unsigned int vbo_ = 0;

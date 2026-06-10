@@ -1,3 +1,5 @@
+#include <GL/glew.h>
+
 #include "orbit.h"
 
 #include <cmath>
@@ -38,5 +40,5 @@ std::unique_ptr<Mesh> Orbit::build() const {
         indices.push_back(static_cast<unsigned int>((i + 1) % segments_));
     }
 
-    return std::make_unique<Mesh>(std::move(verts), std::move(indices));
+    return std::make_unique<Mesh>(std::move(verts), std::move(indices), GL_LINES);
 }

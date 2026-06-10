@@ -25,8 +25,14 @@ void gl_check_impl(const char* call, const char* file, int line) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Constructor — stores CPU data; no GL calls yet.
 // ─────────────────────────────────────────────────────────────────────────────
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices)
-    : vertices_(std::move(vertices)), indices_(std::move(indices)) {}
+Mesh::Mesh(std::vector<Vertex> vertices,
+    std::vector<unsigned int> indices,
+    unsigned int primitive)
+    : vertices_(std::move(vertices))
+    , indices_(std::move(indices))
+    , primitive_(primitive)
+{
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Destructor
@@ -127,9 +133,9 @@ void Mesh::draw() const {
         return;
     }
     GL_CHECK(glBindVertexArray(vao_));
-    GL_CHECK(glDrawElements(GL_TRIANGLES,
-                            static_cast<GLsizei>(indices_.size()),
-                            GL_UNSIGNED_INT,
-                            nullptr));
+    GL_CHECK(glDrawElements(primitive_,
+        static_cast<GLsizei>(indices_.size()),
+        GL_UNSIGNED_INT,
+        nullptr));
     GL_CHECK(glBindVertexArray(0));
 }
