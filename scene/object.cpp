@@ -42,3 +42,9 @@ void Object::render(Shader& shader) const {
         mesh->draw();
     }
 }
+
+void Object::draw_meshes_only() const {
+    for (const auto& mesh : meshes_) {
+        mesh->draw();
+    }
+}

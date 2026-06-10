@@ -94,6 +94,7 @@ SolarSystem::SolarSystem() {}
 // ---------------------------------------------------------------------------
 void SolarSystem::build(Scene& scene) {
     bodies_.clear();
+    orbit_objects_.clear();
 
     // -- Sun (no parent, no orbit ring) --
     PlanetRecord sun_rec = build_body(scene, k_sun_config, nullptr);
@@ -104,25 +105,18 @@ void SolarSystem::build(Scene& scene) {
     for (int i = 0; i < k_planet_count; ++i) {
         PlanetRecord rec = build_body(scene, k_planet_configs[i], sun_transform_);
 
-        // Remember Earth's transform for Moon parenting.
         if (k_planet_configs[i].name == std::string("Earth")) {
             earth_transform_ = rec.transform;
         }
 
-        // Build the orbit ring for this planet.
-        rec.orbit_obj = build_orbit(scene,
-            k_planet_configs[i].orbit_radius,
-            sun_transform_);
-
+        rec.orbit_obj = build_orbit(k_planet_configs[i].orbit_radius, sun_transform_);
         bodies_.push_back(std::move(rec));
     }
 
     // -- Moon (parent = Earth) --
     assert(earth_transform_ != nullptr && "Earth must be built before Moon");
     PlanetRecord moon_rec = build_body(scene, k_moon_config, earth_transform_);
-    moon_rec.orbit_obj = build_orbit(scene,
-        k_moon_config.orbit_radius,
-        earth_transform_);
+    moon_rec.orbit_obj = build_orbit(k_moon_config.orbit_radius, earth_transform_);
     bodies_.push_back(std::move(moon_rec));
 }
 
@@ -168,18 +162,13 @@ PlanetRecord SolarSystem::build_body(Scene& scene,
     return rec;
 }
 
-// ---------------------------------------------------------------------------
-// build_orbit()
-// ---------------------------------------------------------------------------
-Object* SolarSystem::build_orbit(Scene& scene,
-    float orbit_radius,
+Object* SolarSystem::build_orbit(float orbit_radius,
     Transform* parent_transform) {
     Orbit orbit_gen(orbit_radius, k_orbit_segments);
-    auto mesh = orbit_gen.build();   // returns unique_ptr<Mesh>
+    auto mesh = orbit_gen.build();
     mesh->setup_mesh();
 
     auto obj = std::make_unique<Object>();
-    // Orbit ring has no material (rendered via line shader with u_line_color).
     obj->add_mesh(std::move(mesh));
 
     obj->transform.position = Vec3(0.0f, 0.0f, 0.0f);
@@ -189,10 +178,9 @@ Object* SolarSystem::build_orbit(Scene& scene,
     obj->transform.parent = parent_transform;
 
     Object* raw = obj.get();
-    scene.add_object(std::move(obj));
+    orbit_objects_.push_back(std::move(obj));  // SolarSystem 自己持有
     return raw;
 }
-
 // ---------------------------------------------------------------------------
 // update()
 // Advances orbit and self-rotation angles, then recomputes local transforms.
@@ -259,7 +247,12 @@ std::vector<RenderableSphere> SolarSystem::get_scene_data_for_raytracing() const
         rs.center = extract_translation(world);
         rs.radius = rec.config.radius;
         rs.color = rec.config.color;
-        rs.shininess = 32.0f;
+        const std::string& name = rec.config.name;
+        if (name == "Sun")          rs.shininess = 0.f;   // 太阳自发光，不反射
+        else if (name == "Earth")   rs.shininess = 64.f;  // 海洋反光
+        else if (name == "Jupiter") rs.shininess = 48.f;
+        else if (name == "Saturn")  rs.shininess = 48.f;
+        else                        rs.shininess = 16.f;
 
         result.push_back(rs);
     }

@@ -8,10 +8,10 @@
 #include <string>
 #include "../math/vec3.h"
 #include "../raytracing/intersection.h"  // for RenderableSphere (defined in snapshot D)
+#include "../scene/object.h"
 
 // Forward declarations -- avoid pulling in heavy headers here.
 class Scene;
-class Object;
 class Transform;
 class Renderer;
 class Shader;
@@ -94,9 +94,7 @@ private:
 
     // Build an Orbit ring Object and add it to scene.
     // parent_transform: orbit ring inherits the same parent as the planet.
-    Object* build_orbit(Scene& scene,
-                        float orbit_radius,
-                        Transform* parent_transform);
+    Object* build_orbit(float orbit_radius, Transform* parent_transform);
 
     // All bodies: [0]=sun, [1..8]=planets, [9]=moon.
     std::vector<PlanetRecord> bodies_;
@@ -104,5 +102,7 @@ private:
     // Non-owning convenience pointers for parent binding.
     Transform* sun_transform_   = nullptr;
     Transform* earth_transform_ = nullptr;
+
+    std::vector<std::unique_ptr<Object>> orbit_objects_;
 };
 

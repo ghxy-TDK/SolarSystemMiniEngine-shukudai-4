@@ -23,6 +23,7 @@ class Object {
 public:
     explicit Object(std::string name = "");
 
+    void draw_meshes_only() const;
     // --- data ---
     std::string                 name;
     Transform                   transform;

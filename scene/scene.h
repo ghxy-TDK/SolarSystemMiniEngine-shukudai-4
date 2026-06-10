@@ -1,7 +1,7 @@
 #pragma once
 #include "object.h"
 #include "point_light.h"
-#include "particle_system.h"
+#include "../particle/particle_system.h"
 #include <memory>
 #include <vector>
 
